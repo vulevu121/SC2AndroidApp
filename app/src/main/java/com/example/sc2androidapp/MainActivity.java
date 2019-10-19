@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private BluetoothDevice device = null;
@@ -41,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar = null;
     private ImageView bluetoothButton = null;
     private boolean stopListenThread = false;
-    private byte buffer[];
+//    private byte buffer[];
     private int carViewResId = 0;
-    private int baseCarViewResId = 0;
     private ImageView carView = null;
     private ImageView carBaseView = null;
     private Animation fadeIn = null;
@@ -224,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
     public void btListen() {
         final Handler handler= new Handler();
         stopListenThread = false;
-        buffer = new byte[1024];
+//        buffer = new byte[1024];
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -240,6 +241,21 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     Log.d("SERIAL INPUT", string);
+
+//                                    String string2 = "FL=20,FR=21";
+//                                    try {
+//                                        final Pattern pattern = Pattern.compile("FL=(\\d+),FR=(\\d+)");
+//                                        final Matcher matcher = pattern.matcher(string2);
+//
+//                                        int FL = Integer.parseInt(matcher.group(1));
+//                                        int FR = Integer.parseInt(matcher.group(2));
+//
+//                                        Log.d("Front Left Door", String.valueOf(FL));
+//                                        Log.d("Front Right Door", String.valueOf(FR));
+//                                    } catch (Exception e) {
+//                                        e.printStackTrace();
+//                                    }
+
                                 }
                             });
                         }
@@ -278,7 +294,6 @@ public class MainActivity extends AppCompatActivity {
             carView.setImageResource(carViewResId);
             carView.startAnimation(fadeIn);
         }
-
     }
 
     public boolean isDeviceConnected() {
@@ -287,6 +302,11 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    public void getDoorStatus() {
+        if (!isDeviceConnected()) return;
+        btWrite("Door Status?");
     }
 
     public void autoDriverOpen(View v) {
