@@ -13,40 +13,71 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/carView">
 
         <Button
-            android:id="@+id/autoPassengerOpenButton"
+            android:id="@+id/autoOpenPassengerButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
+            android:onClick="autoOpenPassenger"
             android:text="Open Passenger"
-            android:onClick="autoPassengerOpen"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/autoDriverOpenButton"
+            android:id="@+id/autoCloseBothButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
+            android:onClick="autoCloseBoth"
+            android:text="Close Both"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline6"
+            app:layout_constraintTop_toBottomOf="@+id/autoOpenPassengerButton" />
+
+        <Button
+            android:id="@+id/autoOpenDriverButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:insetLeft="10dp"
+            android:insetTop="0dp"
+            android:insetRight="10dp"
+            android:insetBottom="0dp"
+            android:onClick="autoOpenDriver"
             android:text="Open Driver"
-            android:onClick="autoDriverOpen"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/autoOpenBothButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:insetLeft="10dp"
+            android:insetTop="0dp"
+            android:insetRight="10dp"
+            android:insetBottom="0dp"
+            android:onClick="autoOpenBoth"
+
+            android:text="Open Both"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/autoOpenDriverButton" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline6"

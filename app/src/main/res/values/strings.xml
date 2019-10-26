@@ -2,4 +2,31 @@
     <string name="app_name">SC2 Remote</string>
     <string name="tab_text_1">Auto</string>
     <string name="tab_text_2">Manual</string>
+    <string name="tab_text_3">Hydraulic</string>
+
+    <string name="autoOpenBoth">Auto open both\n</string>
+    <string name="autoCloseBoth">Auto close both\n</string>
+
+    <string name="autoOpenDriver">Auto open driver\n</string>
+    <string name="autoCloseDriver">Auto close driver\n</string>
+
+    <string name="autoOpenPassenger">Auto open passenger\n</string>
+    <string name="autoClosePassenger">Auto close passenger\n</string>
+
+    <string name="manualOpenDriver">Manual open driver\n</string>
+    <string name="manualCloseDriver">Manual close driver\n</string>
+    <string name="manualStopDriver">Manual stop driver\n</string>
+
+    <string name="manualOpenPassenger">Manual open passenger\n</string>
+    <string name="manualClosePassenger">Manual close passenger\n</string>
+    <string name="manualStopPassenger">Manual stop passenger\n</string>
+
+    <string name="hydraulicUp">Hydraulic up\n</string>
+    <string name="hydraulicDown">Hydraulic down\n</string>
+    <string name="hydraulicStop">Hydraulic stop\n</string>
+
+    <string name="doorStatus">Door status?\n</string>
+    <string name="systemStatus">System status?\n</string>
+
+
 </resources>

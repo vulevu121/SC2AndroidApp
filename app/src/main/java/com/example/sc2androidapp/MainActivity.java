@@ -11,8 +11,9 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Handler;
+
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -33,6 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
+    private View fragment2View = null;
     private BluetoothDevice device = null;
     private BluetoothSocket socket = null;
     private OutputStream outputStream = null;
@@ -43,20 +45,18 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar = null;
     private ImageView bluetoothButton = null;
     private boolean stopListenThread = false;
-//    private byte buffer[];
+
     private int carViewResId = 0;
     private ImageView carView = null;
     private ImageView carBaseView = null;
     private Animation fadeIn = null;
     private Animation fadeOut = null;
 
-//    private View.OnTouchListener handleTouch = new View.OnTouchListener() {
-//        @Override
-//        public boolean onTouch(View v, MotionEvent event) {
-//            return true;
-//        }
-//
-//    };
+    private final Pattern doorStatusPattern = Pattern.compile("DoorStatus:FL=(\\d+),FR=(\\d+)\\n");
+    private int driverDoorAngle = 0;
+    private int passengerDoorAngle = 0;
+    private int OPEN_THRESHOLD = 10;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         carView.startAnimation(fadeIn);
         carBaseView.startAnimation(fadeIn);
+
     }
 
 
@@ -125,6 +126,93 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         btDisconnect();
+    }
+
+
+    public void setFragment2View(View view) {
+        this.fragment2View = view;
+
+        if (view != null) {
+            Button manualDriverOpenButton = view.findViewById(R.id.manualDriverOpenButton);
+
+            manualDriverOpenButton.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    manualOpenDriverPress();
+                    return true;
+                }
+            });
+
+            manualDriverOpenButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        manualOpenDriverRelease();
+                    }
+                    return false;
+                }
+            });
+
+            Button manualDriverCloseButton = view.findViewById(R.id.manualDriverCloseButton);
+
+            manualDriverCloseButton.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    manualCloseDriverPress();
+                    return true;
+                }
+            });
+
+            manualDriverCloseButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        manualCloseDriverRelease();
+                    }
+                    return false;
+                }
+            });
+
+            Button manualPassengerOpenButton = view.findViewById(R.id.manualPassengerOpenButton);
+
+            manualPassengerOpenButton.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    manualOpenPassengerPress();
+                    return true;
+                }
+            });
+
+            manualPassengerOpenButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        manualOpenPassengerRelease();
+                    }
+                    return false;
+                }
+            });
+
+            Button manualPassengerCloseButton = view.findViewById(R.id.manualPassengerCloseButton);
+
+            manualPassengerCloseButton.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    manualClosePassengerPress();
+                    return true;
+                }
+            });
+
+            manualPassengerCloseButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        manualClosePassengerRelease();
+                    }
+                    return false;
+                }
+            });
+        }
     }
 
     public void btConnect() {
@@ -169,6 +257,10 @@ public class MainActivity extends AppCompatActivity {
 
                         // begin to listen on bluetooth for replies
                         btListen();
+
+                        // ask for door status
+                        btWrite(getString(R.string.doorStatus));
+
                         deviceConnected = true;
                         return;
                     } catch (IOException e) {
@@ -208,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (socket.isConnected() && deviceConnected) {
 
-            progressBar.setVisibility(View.VISIBLE);
+//            progressBar.setVisibility(View.VISIBLE);
 
             try {
                 outputStream.write(msg.getBytes());
@@ -216,16 +308,19 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Unable to write msg", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
-            finally {
-                progressBar.setVisibility(View.GONE);
-            }
+//            finally {
+//                progressBar.setVisibility(View.GONE);
+//            }
         }
     }
 
+
+
     public void btListen() {
-        final Handler handler= new Handler();
+//        final Handler handler= new Handler();
         stopListenThread = false;
 //        buffer = new byte[1024];
+//        stringBuffer = "";
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -233,37 +328,85 @@ public class MainActivity extends AppCompatActivity {
                 while (!Thread.currentThread().isInterrupted() && !stopListenThread) {
                     try {
                         int byteCount = inputStream.available();
-                        if (byteCount > 0) {
-                            byte rawBytes[] = new byte[byteCount];
-                            inputStream.read(rawBytes);
-                            final String string = new String(rawBytes, "UTF-8");
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Log.d("SERIAL INPUT", string);
+                        if (byteCount > 5) {
+                            byte inputBytes[] = new byte[byteCount];
+                            inputStream.read(inputBytes);
+                            final String string = new String(inputBytes, "UTF-8");
 
-//                                    String string2 = "FL=20,FR=21";
-//                                    try {
-//                                        final Pattern pattern = Pattern.compile("FL=(\\d+),FR=(\\d+)");
-//                                        final Matcher matcher = pattern.matcher(string2);
-//
-//                                        int FL = Integer.parseInt(matcher.group(1));
-//                                        int FR = Integer.parseInt(matcher.group(2));
-//
+                            Log.d("SERIAL INPUT", string);
+
+                            if (string.contains("DoorStatus:")) {
+                                try {
+                                    final Matcher m = doorStatusPattern.matcher(string);
+//                                    Log.d("Match", String.valueOf(m.matches()));
+                                    if (m.matches()) {
+                                        int FL = Integer.parseInt(m.group(1));
+                                        int FR = Integer.parseInt(m.group(2));
+                                        Log.d("FL Door Angle", String.valueOf(FL));
+                                        Log.d("FR Door Angle", String.valueOf(FR));
+                                        setDoorAngles(FL, FR);
+                                    }
+
+                                    m.reset();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+//                            else if (string.contains("DoorStatus:")) {
+//                                try {
+//                                    final Matcher m = doorStatusPattern.matcher(string);
+////                                    Log.d("Match", String.valueOf(m.matches()));
+//                                    if (m.matches()) {
+//                                        int FL = Integer.parseInt(m.group(1));
+//                                        int FR = Integer.parseInt(m.group(2));
 //                                        Log.d("Front Left Door", String.valueOf(FL));
 //                                        Log.d("Front Right Door", String.valueOf(FR));
-//                                    } catch (Exception e) {
-//                                        e.printStackTrace();
+//                                        driverDoorAngle = FL;
+//                                        passengerDoorAngle = FR;
 //                                    }
+//
+//                                    m.reset();
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
 
-                                }
-                            });
+//                            handler.post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Log.d("SERIAL INPUT", string);
+//
+//                                    if (string.contains("DoorStatus:")) {
+//                                        try {
+//
+//                                            final Matcher m = doorStatusPattern.matcher(string);
+//                                            Log.d("Match", String.valueOf(m.matches()));
+//                                            if (m.matches()) {
+//                                                int FL = Integer.parseInt(m.group(1));
+//                                                int FR = Integer.parseInt(m.group(2));
+//                                                Log.d("Front Left Door", String.valueOf(FL));
+//                                                Log.d("Front Right Door", String.valueOf(FR));
+//                                                driverDoorAngle = FL;
+//                                                passengerDoorAngle = FR;
+//                                            }
+//
+//                                            m.reset();
+//                                        } catch (Exception e) {
+//                                            e.printStackTrace();
+//                                        }
+//
+//                                    }
+//
+////                                    final String string2 = "FL=20,FR=21";
+//
+//                                }
+//                            });
                         }
                     }
                     catch (IOException e) {
                         stopListenThread = true;
                     }
-
+//
                 }
             }
         });
@@ -274,22 +417,22 @@ public class MainActivity extends AppCompatActivity {
     public void setCarView() {
         carBaseView.setImageResource(carViewResId);
 
-        if (driverDoorOpen & !passengerDoorOpen) {
+        if (driverDoorOpen && !passengerDoorOpen) {
             carViewResId = R.drawable.driver_door_up;
             carView.setImageResource(carViewResId);
             carView.startAnimation(fadeIn);
         }
-        else if (driverDoorOpen & passengerDoorOpen) {
+        else if (driverDoorOpen && passengerDoorOpen) {
             carViewResId = R.drawable.both_doors_up;
             carView.setImageResource(carViewResId);
             carView.startAnimation(fadeIn);
         }
-        else if (!driverDoorOpen & !passengerDoorOpen) {
+        else if (!driverDoorOpen && !passengerDoorOpen) {
             carViewResId = R.drawable.both_doors_down;
             carView.setImageResource(carViewResId);
             carView.startAnimation(fadeIn);
         }
-        else if (!driverDoorOpen & passengerDoorOpen) {
+        else if (!driverDoorOpen && passengerDoorOpen) {
             carViewResId = R.drawable.passenger_door_up;
             carView.setImageResource(carViewResId);
             carView.startAnimation(fadeIn);
@@ -304,106 +447,119 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void getDoorStatus() {
-        if (!isDeviceConnected()) return;
-        btWrite("Door Status?");
+//    public void getDoorStatus() {
+//        if (!isDeviceConnected()) return;
+//        btWrite(getString(R.string.doorStatus));
+//    }
+
+    public void setDoorAngles(int driverDoor, int passengerDoor) {
+        if (driverDoor >= 0 && driverDoor != driverDoorAngle) {
+            driverDoorAngle = driverDoor;
+            driverDoorOpen = (driverDoor > OPEN_THRESHOLD);
+        }
+
+        if (passengerDoor >= 0 && passengerDoor != passengerDoorAngle) {
+            passengerDoorAngle = passengerDoor;
+            passengerDoorOpen = (passengerDoor > OPEN_THRESHOLD);
+        }
+        updateDoorStatus();
     }
 
-    public void autoDriverOpen(View v) {
-        if (!isDeviceConnected()) return;
+    public void updateDoorStatus() {
+        Button autoOpenDriverButton = findViewById(R.id.autoOpenDriverButton);
+        Button autoOpenPassengerButton = findViewById(R.id.autoOpenPassengerButton);
 
-        Button button = v.findViewById(R.id.autoDriverOpenButton);
-
-        if (button.getText().equals("Open Driver")) {
-            btWrite("Auto open driver\n");
-//            Toast.makeText(getApplicationContext(), "Auto Open Driver", Toast.LENGTH_SHORT).show();
-            driverDoorOpen = true;
-            button.setText("Close Driver");
-        }
-        else {
-            btWrite("Auto close driver\n");
-//            Toast.makeText(getApplicationContext(), "Auto Close Driver", Toast.LENGTH_SHORT).show();
-            driverDoorOpen = false;
-            button.setText("Open Driver");
+        if (autoOpenDriverButton != null) {
+            autoOpenDriverButton.setText(driverDoorOpen ? "Close Driver" : "Open Driver");
         }
 
-        setCarView();
-
-    }
-
-    public void autoPassengerOpen(View v) {
-        if (!isDeviceConnected()) return;
-
-        Button button = v.findViewById(R.id.autoPassengerOpenButton);
-
-        if (button.getText() == "Open Passenger") {
-            btWrite("Auto open passenger\n");
-//            Toast.makeText(getApplicationContext(), "Auto Open Passenger", Toast.LENGTH_SHORT).show();
-            passengerDoorOpen = true;
-            button.setText("Close Passenger");
-        }
-        else {
-            btWrite("Auto close passenger\n");
-//            Toast.makeText(getApplicationContext(), "Auto Close Passenger", Toast.LENGTH_SHORT).show();
-            passengerDoorOpen = false;
-            button.setText("Open Passenger");
+        if (autoOpenPassengerButton != null) {
+            autoOpenPassengerButton.setText(passengerDoorOpen ? "Close Passenger" : "Open Passenger");
         }
 
         setCarView();
     }
 
+    public void autoOpenDriver(View v) {
+        if (!isDeviceConnected()) return;
+        btWrite(getString(driverDoorOpen ? R.string.autoCloseDriver : R.string.autoOpenDriver ));
+    }
 
+    public void autoOpenPassenger(View v) {
+        if (!isDeviceConnected()) return;
+        btWrite(getString(passengerDoorOpen ? R.string.autoClosePassenger : R.string.autoOpenPassenger ));
+    }
+
+    public void autoOpenBoth(View v) {
+        if (!isDeviceConnected()) return;
+        btWrite(getString(R.string.autoOpenBoth));
+    }
+
+    public void autoCloseBoth(View v) {
+        if (!isDeviceConnected()) return;
+        btWrite(getString(R.string.autoCloseBoth));
+    }
 
     // FOR DRIVER SIDE
 
-    public void manualDriverOpenPress() {
+    public void manualOpenDriverPress() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual driver open", Toast.LENGTH_SHORT).show();
-        btWrite("Manual driver open\n");
+        btWrite(getString(R.string.manualOpenDriver));
     }
 
-    public void manualDriverOpenRelease() {
+    public void manualOpenDriverRelease() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual driver stop", Toast.LENGTH_SHORT).show();
-        btWrite("Manual driver stop\n");
+        btWrite(getString(R.string.manualStopDriver));
     }
 
-    public void manualDriverClosePress() {
+    public void manualCloseDriverPress() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual driver close", Toast.LENGTH_SHORT).show();
-        btWrite("Manual driver close\n");
+        btWrite(getString(R.string.manualCloseDriver));
     }
 
-    public void manualDriverCloseRelease() {
+    public void manualCloseDriverRelease() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual driver stop", Toast.LENGTH_SHORT).show();
-        btWrite("Manual driver stop\n");
+        btWrite(getString(R.string.manualStopDriver));
     }
     
     // FOR PASSENGER SIDE
 
-    public void manualPassengerOpenPress() {
+    public void manualOpenPassengerPress() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual passenger open", Toast.LENGTH_SHORT).show();
-        btWrite("Manual passenger open\n");
+        btWrite(getString(R.string.manualOpenPassenger));
     }
 
-    public void manualPassengerOpenRelease() {
+    public void manualOpenPassengerRelease() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual passenger stop", Toast.LENGTH_SHORT).show();
-        btWrite("Manual passenger stop\n");
+        btWrite(getString(R.string.manualStopPassenger));
     }
 
-    public void manualPassengerClosePress() {
+    public void manualClosePassengerPress() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual passenger close", Toast.LENGTH_SHORT).show();
-        btWrite("Manual passenger close\n");
+        btWrite(getString(R.string.manualClosePassenger));
     }
 
-    public void manualPassengerCloseRelease() {
+    public void manualClosePassengerRelease() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual passenger stop", Toast.LENGTH_SHORT).show();
-        btWrite("Manual passenger stop\n");
+        btWrite(getString(R.string.manualStopPassenger));
+    }
+
+    public void hydraulicUp(View v) {
+        if (!isDeviceConnected()) return;
+        btWrite(getString(R.string.hydraulicUp));
+    }
+
+    public void hydraulicDown(View v) {
+        if (!isDeviceConnected()) return;
+        btWrite(getString(R.string.hydraulicDown));
     }
     
     public void bluetoothButtonClicked(View v) {
