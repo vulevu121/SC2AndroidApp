@@ -10,94 +10,86 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/black"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@android:color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
 
-        <LinearLayout
-            android:id="@+id/indicatorsLayout"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@android:color/black"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="10" />
-
-            <ImageButton
-                android:id="@+id/bluetoothButton"
-                style="@style/Widget.AppCompat.ImageButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:contentDescription="Bluetooth Icon"
-                android:onClick="bluetoothButtonClicked"
-                android:scaleType="fitCenter"
-                android:tint="@color/colorPrimary"
-                app:srcCompat="@drawable/bluetooth_connect" />
-        </LinearLayout>
-
         <ImageView
             android:id="@+id/carBaseView"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="0dp"
             android:background="@android:color/black"
             android:contentDescription="Base Car Image"
+            app:layout_constraintBottom_toBottomOf="@+id/carView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/indicatorsLayout"
+            app:layout_constraintTop_toTopOf="@+id/carView"
             app:srcCompat="@drawable/both_doors_down" />
 
 
         <ImageView
             android:id="@+id/carView"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="0dp"
             android:background="@android:color/black"
             android:contentDescription="Car Image"
+            android:padding="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/view_pager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/indicatorsLayout"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/both_doors_down" />
 
+        <ImageView
+            android:id="@+id/gradientBottomView"
+            android:layout_width="411dp"
+            android:layout_height="30dp"
+            app:layout_constraintBottom_toTopOf="@+id/carView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/gradient_bottom" />
+
+        <ImageView
+            android:id="@+id/gradientTopView"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/gradient_top" />
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
             android:background="#000000"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tabs"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/carView">
+            app:layout_constraintStart_toStartOf="parent">
 
         </androidx.viewpager.widget.ViewPager>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ProgressBar
             android:id="@+id/busyIndicator"
@@ -110,6 +102,80 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/indicatorsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/view_pager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageButton
+                android:id="@+id/doorLockedButton"
+                style="@style/Widget.AppCompat.ImageButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/circle"
+                android:contentDescription="Bluetooth Icon"
+                android:onClick="bluetoothButtonClicked"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:tint="@color/colorPrimary"
+                app:srcCompat="@drawable/car_door_lock" />
+
+            <ImageButton
+                android:id="@+id/parkLightsButton"
+                style="@style/Widget.AppCompat.ImageButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/circle"
+                android:contentDescription="Bluetooth Icon"
+                android:onClick="bluetoothButtonClicked"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:tint="@color/colorPrimary"
+                app:srcCompat="@drawable/car_parking_lights" />
+
+            <ImageButton
+                android:id="@+id/headLightsButton"
+                style="@style/Widget.AppCompat.ImageButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/circle"
+                android:contentDescription="Bluetooth Icon"
+                android:onClick="bluetoothButtonClicked"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:tint="@color/colorPrimary"
+                app:srcCompat="@drawable/car_light_dimmed" />
+
+            <ImageButton
+                android:id="@+id/bluetoothButton"
+                style="@style/Widget.AppCompat.ImageButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/circle"
+                android:contentDescription="Bluetooth Icon"
+                android:onClick="bluetoothButtonClicked"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:tint="@color/colorPrimary"
+                app:srcCompat="@drawable/bluetooth_connect" />
+
+
+
+        </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

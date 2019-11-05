@@ -19,34 +19,38 @@
 
         <Button
             android:id="@+id/hydraulicUpButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
-            android:onClick="hydraulicUp"
             android:text="Hydraulic Up"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:icon="@drawable/arrow_up_bold_outline"
+            app:layout_constraintBottom_toTopOf="@+id/hydraulicDownButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:strokeColor="@color/colorAccent" />
 
         <Button
             android:id="@+id/hydraulicDownButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
-            android:onClick="hydraulicDown"
             android:text="Hydraulic Down"
+            app:icon="@drawable/arrow_down_bold_outline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toBottomOf="@+id/hydraulicUpButton" />
+            app:strokeColor="@color/colorAccent" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline6"

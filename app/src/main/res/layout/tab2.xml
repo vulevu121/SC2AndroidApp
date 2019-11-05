@@ -18,61 +18,73 @@
 
         <Button
             android:id="@+id/manualDriverOpenButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
-            android:text="Open Driver"
 
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="Open Driver"
+            app:icon="@drawable/arrow_top_left_bold_outline"
+            app:layout_constraintBottom_toTopOf="@+id/manualDriverCloseButton"
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:strokeColor="@color/colorAccent" />
 
         <Button
             android:id="@+id/manualDriverCloseButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
             android:text="Close Driver"
+            app:icon="@drawable/arrow_bottom_right_bold_outline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/manualDriverOpenButton" />
+            app:strokeColor="@color/colorAccent" />
 
         <Button
             android:id="@+id/manualPassengerOpenButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
             android:text="Open Passenger"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:icon="@drawable/arrow_top_right_bold_outline"
+            app:layout_constraintBottom_toTopOf="@+id/manualPassengerCloseButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:strokeColor="@color/colorAccent" />
 
 
         <Button
             android:id="@+id/manualPassengerCloseButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
             android:text="Close Passenger"
+            app:icon="@drawable/arrow_bottom_left_bold_outline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toBottomOf="@+id/manualPassengerOpenButton" />
+            app:strokeColor="@color/colorAccent" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline6"

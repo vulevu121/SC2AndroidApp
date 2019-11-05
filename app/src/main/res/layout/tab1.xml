@@ -13,71 +13,83 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/carView">
 
         <Button
             android:id="@+id/autoOpenPassengerButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
             android:onClick="autoOpenPassenger"
             android:text="Open Passenger"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:icon="@drawable/car_door"
+            app:layout_constraintBottom_toTopOf="@+id/autoCloseBothButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:strokeColor="@color/colorAccent" />
 
         <Button
             android:id="@+id/autoCloseBothButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
             android:onClick="autoCloseBoth"
             android:text="Close Both"
+            app:icon="@drawable/close_outline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toBottomOf="@+id/autoOpenPassengerButton" />
+            app:strokeColor="@color/colorAccent" />
 
         <Button
             android:id="@+id/autoOpenDriverButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
             android:insetRight="10dp"
             android:insetBottom="0dp"
             android:onClick="autoOpenDriver"
             android:text="Open Driver"
-
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:icon="@drawable/car_door"
+            app:layout_constraintBottom_toTopOf="@+id/autoOpenBothButton"
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:strokeColor="@color/colorAccent"
+            app:strokeWidth="1dp" />
 
         <Button
             android:id="@+id/autoOpenBothButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginBottom="20dp"
             android:insetLeft="10dp"
             android:insetTop="0dp"
+
             android:insetRight="10dp"
             android:insetBottom="0dp"
             android:onClick="autoOpenBoth"
-
             android:text="Open Both"
+            app:icon="@drawable/arrow_left_right_bold_outline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/autoOpenDriverButton" />
+            app:strokeColor="@color/colorAccent" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline6"

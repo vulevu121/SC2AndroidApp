@@ -27,6 +27,7 @@
 
     <string name="doorStatus">Door status?\n</string>
     <string name="systemStatus">System status?\n</string>
+    <string name="title_activity_maps">Map</string>
 
 
 </resources>

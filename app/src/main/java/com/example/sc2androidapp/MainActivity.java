@@ -12,6 +12,7 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -34,7 +36,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
+//    private GoogleMap mMap;
+
     private View fragment2View = null;
+    private View fragment3View = null;
     private BluetoothDevice device = null;
     private BluetoothSocket socket = null;
     private OutputStream outputStream = null;
@@ -43,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean driverDoorOpen = false;
     private boolean passengerDoorOpen = false;
     private ProgressBar progressBar = null;
-    private ImageView bluetoothButton = null;
+    private ImageButton bluetoothButton = null;
     private boolean stopListenThread = false;
 
     private int carViewResId = 0;
@@ -55,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private final Pattern doorStatusPattern = Pattern.compile("DoorStatus:FL=(\\d+),FR=(\\d+)\\n");
     private int driverDoorAngle = 0;
     private int passengerDoorAngle = 0;
-    private int OPEN_THRESHOLD = 10;
+    static private int OPEN_THRESHOLD = 10;
 
 
     @Override
@@ -67,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+
+//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.map);
+//        mapFragment.getMapAsync(this);
 
         progressBar = findViewById(R.id.busyIndicator);
         bluetoothButton = findViewById(R.id.bluetoothButton);
@@ -99,20 +108,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
 //    @Override
 //    protected void onStart() {
 //        super.onStart();
 //        btConnect();
+////        btDelayedConnect();
 //    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        btConnect();
-
-
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+////        btConnect();
+////        btDelayedConnect();
+//
+//    }
 
 //    @Override
 //    protected void onStop() {
@@ -147,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_UP) {
-                        manualOpenDriverRelease();
+                        manualDriverStop();
                     }
                     return false;
                 }
@@ -167,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_UP) {
-                        manualCloseDriverRelease();
+                        manualDriverStop();
                     }
                     return false;
                 }
@@ -187,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_UP) {
-                        manualOpenPassengerRelease();
+                        manualPassengerStop();
                     }
                     return false;
                 }
@@ -207,12 +216,59 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_UP) {
-                        manualClosePassengerRelease();
+                        manualPassengerStop();
                     }
                     return false;
                 }
             });
         }
+    }
+
+    public void setFragment3View(View view) {
+        this.fragment3View = view;
+
+        if (view != null) {
+            Button hydraulicUpButton = view.findViewById(R.id.hydraulicUpButton);
+
+            hydraulicUpButton.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    hydraulicUpPress();
+                    return true;
+                }
+            });
+
+            hydraulicUpButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        hydraulicStop();
+                    }
+                    return false;
+                }
+            });
+
+            Button hydraulicDownButton = view.findViewById(R.id.hydraulicDownButton);
+
+            hydraulicDownButton.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    hydraulicDownPress();
+                    return true;
+                }
+            });
+
+            hydraulicDownButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        hydraulicStop();
+                    }
+                    return false;
+                }
+            });
+        }
+
     }
 
     public void btConnect() {
@@ -312,6 +368,29 @@ public class MainActivity extends AppCompatActivity {
 //                progressBar.setVisibility(View.GONE);
 //            }
         }
+    }
+
+    private Runnable btConnectRunnable = new Runnable() {
+        @Override
+        public void run() {
+            btConnect();
+        }
+    };
+
+    public void btDelayedConnect() {
+        final Handler handler = new Handler();
+
+        handler.postDelayed(btConnectRunnable, 2000);
+
+//        Thread thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                handler.postDelayed(btConnectRunnable, 2000);
+//            }
+//        });
+//
+//        thread.start();
+
     }
 
 
@@ -456,13 +535,15 @@ public class MainActivity extends AppCompatActivity {
         if (driverDoor >= 0 && driverDoor != driverDoorAngle) {
             driverDoorAngle = driverDoor;
             driverDoorOpen = (driverDoor > OPEN_THRESHOLD);
+            updateDoorStatus();
         }
 
         if (passengerDoor >= 0 && passengerDoor != passengerDoorAngle) {
             passengerDoorAngle = passengerDoor;
             passengerDoorOpen = (passengerDoor > OPEN_THRESHOLD);
+            updateDoorStatus();
         }
-        updateDoorStatus();
+
     }
 
     public void updateDoorStatus() {
@@ -508,11 +589,6 @@ public class MainActivity extends AppCompatActivity {
         btWrite(getString(R.string.manualOpenDriver));
     }
 
-    public void manualOpenDriverRelease() {
-        if (!isDeviceConnected()) return;
-//        Toast.makeText(getApplicationContext(), "Manual driver stop", Toast.LENGTH_SHORT).show();
-        btWrite(getString(R.string.manualStopDriver));
-    }
 
     public void manualCloseDriverPress() {
         if (!isDeviceConnected()) return;
@@ -520,12 +596,13 @@ public class MainActivity extends AppCompatActivity {
         btWrite(getString(R.string.manualCloseDriver));
     }
 
-    public void manualCloseDriverRelease() {
+    public void manualDriverStop() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual driver stop", Toast.LENGTH_SHORT).show();
         btWrite(getString(R.string.manualStopDriver));
     }
-    
+
+
     // FOR PASSENGER SIDE
 
     public void manualOpenPassengerPress() {
@@ -534,32 +611,33 @@ public class MainActivity extends AppCompatActivity {
         btWrite(getString(R.string.manualOpenPassenger));
     }
 
-    public void manualOpenPassengerRelease() {
-        if (!isDeviceConnected()) return;
-//        Toast.makeText(getApplicationContext(), "Manual passenger stop", Toast.LENGTH_SHORT).show();
-        btWrite(getString(R.string.manualStopPassenger));
-    }
-
     public void manualClosePassengerPress() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual passenger close", Toast.LENGTH_SHORT).show();
         btWrite(getString(R.string.manualClosePassenger));
     }
 
-    public void manualClosePassengerRelease() {
+    public void manualPassengerStop() {
         if (!isDeviceConnected()) return;
 //        Toast.makeText(getApplicationContext(), "Manual passenger stop", Toast.LENGTH_SHORT).show();
         btWrite(getString(R.string.manualStopPassenger));
     }
 
-    public void hydraulicUp(View v) {
+    // FOR HYDRAULICS
+
+    public void hydraulicUpPress() {
         if (!isDeviceConnected()) return;
         btWrite(getString(R.string.hydraulicUp));
     }
 
-    public void hydraulicDown(View v) {
+    public void hydraulicDownPress() {
         if (!isDeviceConnected()) return;
         btWrite(getString(R.string.hydraulicDown));
+    }
+
+    public void hydraulicStop() {
+        if (!isDeviceConnected()) return;
+        btWrite(getString(R.string.hydraulicStop));
     }
     
     public void bluetoothButtonClicked(View v) {
@@ -567,7 +645,17 @@ public class MainActivity extends AppCompatActivity {
             btDisconnect();
         }
         else {
-            btConnect();
+//            btConnect();
         }
     }
+
+//    @Override
+//    public void onMapReady(GoogleMap googleMap) {
+//        mMap = googleMap;
+//        googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style));
+//        // Add a marker in Sydney and move the camera
+//        LatLng karma = new LatLng(33.644999, -117.713443);
+//        mMap.addMarker(new MarkerOptions().position(karma).title("Irvine Headquarter").icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_96x96)));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(karma, 15));
+//    }
 }
