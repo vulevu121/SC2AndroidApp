@@ -1,2 +1,2 @@
-# Vehicle Remote App
-A mobile application for Android that can control vehicle features (doors, lights, etc.)
+# SC2AndroidApp
+A vehicle remote mobile application for Android that can control some vehicle features (doors, lights, etc.) via Bluetooth.
